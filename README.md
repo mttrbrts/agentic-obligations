@@ -2,7 +2,7 @@
 
 A prototype demonstrating the [Accord Project](https://accordproject.org) as the open obligations layer for agentic commerce.
 
-<video src="docs/agentic-obligations.mp4" controls></video>
+![demo](docs/agentic-obligations.gif)
 
 
 
