@@ -2,15 +2,80 @@
 
 A prototype demonstrating the [Accord Project](https://accordproject.org) as the open obligations layer for agentic commerce.
 
+<video src="docs/agentic-obligations.mp4" controls></video>
+
+
+
 An AI agent's SaaS procurement authority is encoded as a [Cicero](https://github.com/accordproject/cicero) smart legal contract template. An [APAP](https://github.com/accordproject/apap)-aligned MCP server evaluates the contract for every purchase request and returns a structured obligations bundle. That bundle is SHA-256 hashed and embedded into an [AP2](https://github.com/google-agentic-commerce/AP2) (Google Agent Payments Protocol) payment mandate — cryptographically binding each payment to the contract that authorised it.
 
 ## Quick Start
+
+### Option A — CLI (scripted run)
 
 ```bash
 npm install
 npm run build
 npm run demo
 ```
+
+### Option B — Live agent session (MCP)
+
+Run the demo interactively through an AI agent (GitHub Copilot, Claude Code, etc.) by connecting the MCP server to your agent's runtime.
+
+**1. Build the packages**
+
+```bash
+npm install && npm run build
+```
+
+**2. Register the MCP server with your agent**
+
+<details>
+<summary>VS Code / GitHub Copilot — <code>mcp.json</code></summary>
+
+Add to your user-level `mcp.json` (`~/.config/Code/User/mcp.json` on Linux, `~/Library/Application Support/Code/User/mcp.json` on macOS):
+
+```json
+{
+  "servers": {
+    "accord-obligations": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["/absolute/path/to/phase2-demo/packages/mcp-server/dist/index.js"]
+    }
+  }
+}
+```
+
+</details>
+
+<details>
+<summary>Claude Code — <code>.claude/settings.json</code></summary>
+
+Already configured in this repo — open the project in Claude Code and the `accord-obligations` server starts automatically.
+
+```json
+{
+  "mcpServers": {
+    "accord-obligations": {
+      "command": "node",
+      "args": ["packages/mcp-server/dist/index.js"]
+    }
+  }
+}
+```
+
+</details>
+
+**3. Reset state and run the demo**
+
+Ask the agent to run the demo — type `/accord-obligations-demo` in either Copilot or Claude Code. To reset state between runs:
+
+```
+Call delete_agreement with agreementId: "acme-2026"
+```
+
+Or delete `.state/acme-2026.json` manually.
 
 ## Architecture
 

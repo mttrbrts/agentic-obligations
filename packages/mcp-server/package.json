@@ -15,6 +15,7 @@
     "@accordproject/cicero-core": "^0.25.2",
     "@accordproject/concerto-core": "^3.20.3",
     "@accordproject/template-engine": "file:../../../template-engine",
+    "@ap-demo/ap2-bridge": "*",
     "@modelcontextprotocol/sdk": "^1.12.0",
     "agent-saas-authority": "*",
     "zod": "^3.25.28"

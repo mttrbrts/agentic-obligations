@@ -4,6 +4,13 @@ import { canonicalJSONStringify } from '../lib/canonical.js';
 import { sha256Hex } from '../lib/hash.js';
 import { loadContract, saveContract } from '../lib/contract-store.js';
 import { createRequire } from 'node:module';
+import {
+  buildCheckoutMandate,
+  buildPaymentMandate,
+  StubMerchant,
+  StubPaymentProcessor,
+} from '@ap-demo/ap2-bridge';
+import type { CheckoutReceipt, PaymentReceipt } from '@ap-demo/ap2-bridge';
 
 const require = createRequire(import.meta.url);
 
@@ -27,6 +34,15 @@ export interface AuthorizationDecision {
   newState?: unknown;
   triggerResponse?: unknown;
 }
+
+/** Human-readable display names for the demo vendors. */
+const VENDOR_NAMES: Record<string, string> = {
+  'workspace.google.com': 'Google Workspace',
+  'figma.com': 'Figma',
+  'atlassian.com': 'Atlassian',
+  'slack.com': 'Slack',
+  'notion.so': 'Notion',
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const procCache = new Map<string, any>();
@@ -61,8 +77,13 @@ export function registerTriggerAgreement(server: McpServer): void {
         .optional()
         .default(true)
         .describe('When true, include obligationsHash and canonicalObligations in the response.'),
+      agentId: z
+        .string()
+        .optional()
+        .default('agent-007')
+        .describe('Agent identifier embedded in the AP2 checkout mandate. Defaults to "agent-007".'),
     },
-    async ({ agreementId, payload, now: nowStr, includeObligationsHash }) => {
+    async ({ agreementId, payload, now: nowStr, includeObligationsHash, agentId }) => {
       const rec = await loadContract(agreementId);
       if (!rec) {
         throw new Error(`No agreement with id '${agreementId}'. Call create_agreement first.`);
@@ -130,8 +151,75 @@ export function registerTriggerAgreement(server: McpServer): void {
         `[trigger-agreement] decision=${decision.decision} obligations=${decision.obligations.length} hash=${decision.obligationsHash ?? 'n/a'} historyLen=${rec.history.length}\n`
       );
 
+      // ── AP2 mandate chain — side-effect of authorization ───────────────────
+      // DENIED decisions produce no payment mandate. APPROVED and
+      // REQUIRES_HUMAN_APPROVAL both advance through the full chain.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let ap2: any = null;
+      if (decision.decision !== 'DENIED') {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const req = request as any;
+        const merchantId: string = req.vendorId ?? 'unknown-vendor';
+        const merchantName: string = VENDOR_NAMES[merchantId] ?? merchantId;
+        const amountMinorUnits = Math.round((req.amount?.doubleValue ?? 0) * 100);
+        const currency: string = req.amount?.currencyCode ?? 'USD';
+
+        const checkoutMandate = buildCheckoutMandate({
+          agentId,
+          merchantId,
+          merchantName,
+          items: [{ id: merchantId + '-sku', title: req.productName ?? merchantId, price: amountMinorUnits }],
+          totalAmount: { amount: amountMinorUnits, currency },
+          obligationsHash: decision.obligationsHash,
+          templateId: rec.templatePath,
+        });
+
+        const paymentMandate = buildPaymentMandate({
+          checkoutMandate,
+          paymentInstrument: { id: 'pi-acme-corp-visa', type: 'card', description: 'Acme Corp Visa ****4242' },
+        });
+
+        // Stubs log to console.log — redirect to stderr so we don't corrupt
+        // the JSON-RPC stdio channel.
+        const origLog = console.log.bind(console);
+        const origWarn = console.warn.bind(console);
+        console.log = (...args: unknown[]) =>
+          process.stderr.write('[ap2] ' + args.map(String).join(' ') + '\n');
+        console.warn = (...args: unknown[]) =>
+          process.stderr.write('[ap2] ' + args.map(String).join(' ') + '\n');
+
+        let checkoutReceipt: CheckoutReceipt;
+        let paymentReceipt: PaymentReceipt;
+        try {
+          checkoutReceipt = new StubMerchant('stub-merchant.demo.local').receiveCheckoutMandate(checkoutMandate);
+          paymentReceipt = new StubPaymentProcessor('stub-processor.demo.local').processPayment(paymentMandate);
+        } finally {
+          console.log = origLog;
+          console.warn = origWarn;
+        }
+
+        const obligationsHashVerified =
+          !!decision.obligationsHash &&
+          checkoutMandate.accordObligations?.hash === decision.obligationsHash;
+
+        ap2 = {
+          checkoutReceipt,
+          paymentReceipt,
+          obligationsHashVerified,
+          mandateChain: {
+            checkoutHash: checkoutMandate.checkout_hash,
+            paymentTransactionId: paymentReceipt.payment_id ?? null,
+            accordObligationsHash: checkoutMandate.accordObligations?.hash ?? null,
+          },
+        };
+
+        process.stderr.write(
+          `[trigger-agreement] ap2 checkout=${checkoutReceipt.status} payment=${paymentReceipt.status} hashVerified=${obligationsHashVerified}\n`
+        );
+      }
+
       return {
-        content: [{ type: 'text' as const, text: JSON.stringify(decision, null, 2) }],
+        content: [{ type: 'text' as const, text: JSON.stringify({ ...decision, ap2 }, null, 2) }],
       };
     }
   );
