@@ -1,0 +1,53 @@
+{
+    "name": "agent-saas-authority",
+    "displayName": "Agent SaaS Authority",
+    "version": "0.1.0",
+    "description": "A contract granting a named AI agent scoped authority to procure and renew SaaS subscriptions on behalf of a corporate principal.",
+    "author": "Accord Project",
+    "license": "Apache-2.0",
+    "type": "module",
+    "accordproject": {
+        "runtime": "typescript",
+        "template": "contract",
+        "cicero": "^0.25.0"
+    },
+    "keywords": [
+        "agent",
+        "ai",
+        "saas",
+        "procurement",
+        "authority",
+        "contract",
+        "authorization",
+        "subscription",
+        "renewal",
+        "spend-limit",
+        "human-in-the-loop"
+    ],
+    "tags": [
+        "ai-agent",
+        "procurement"
+    ],
+    "scripts": {
+        "verify": "node verify.mjs",
+        "install-deps": "npm install",
+        "compile": "concerto compile --model model/model.cto --target typescript --output logic/generated && node scripts/fix-generated-imports.mjs",
+        "build:logic": "tsc -p logic/tsconfig.json",
+        "build": "npm run compile && npm run build:logic",
+        "test": "vitest run"
+    },
+    "main": "logic/dist/logic.js",
+    "exports": {
+        ".": "./logic/dist/logic.js",
+        "./logic": "./logic/dist/logic.js"
+    },
+    "dependencies": {
+        "@accordproject/template-engine": "^2.7.1"
+    },
+    "devDependencies": {
+        "@accordproject/concerto-cli": "^4.0.0",
+        "typescript": "^5.4.0",
+        "vitest": "^1.6.0",
+        "@types/node": "^20.11.0"
+    }
+}

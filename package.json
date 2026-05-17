@@ -1,0 +1,18 @@
+{
+  "name": "phase2-demo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Accord Project Phase 2 demo — MCP-evaluated contract obligations cryptographically linked to AP2 payment mandates",
+  "workspaces": [
+    "packages/ap2-bridge",
+    "templates/agent-saas-authority",
+    "packages/mcp-server",
+    "packages/demo-cli"
+  ],
+  "scripts": {
+    "build": "npm run build -w @ap-demo/ap2-bridge && npm run build -w agent-saas-authority && npm run build -w @ap-demo/obligations-mcp && npm run build -w @ap-demo/demo-cli",
+    "demo": "node packages/demo-cli/dist/index.js",
+    "test": "npm test --workspaces --if-present",
+    "verify-template": "node templates/agent-saas-authority/verify.mjs"
+  }
+}

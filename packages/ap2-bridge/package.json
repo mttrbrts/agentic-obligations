@@ -1,0 +1,22 @@
+{
+  "name": "@ap-demo/ap2-bridge",
+  "version": "0.1.0",
+  "description": "AP2 (Google Agent Payments Protocol) types, builders, and stub implementations for the Accord Project Phase 2 demo.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.5.0"
+  }
+}

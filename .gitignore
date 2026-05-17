@@ -1,0 +1,9 @@
+node_modules/
+dist/
+*.log
+
+# Runtime contract state (populated at demo time)
+packages/mcp-server/.state/
+
+# AP2 spec clone (external dependency, not part of this repo)
+repos/

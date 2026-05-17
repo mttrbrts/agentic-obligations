@@ -1,0 +1,102 @@
+concerto version "^3.0.0"
+
+namespace org.accordproject.demo.agentauthority@0.1.0
+
+import org.accordproject.money@0.3.0.{MonetaryAmount} from https://models.accordproject.org/money@0.3.0.cto
+import org.accordproject.runtime@0.2.0.{Request,Response,State} from https://models.accordproject.org/accordproject/runtime@0.2.0.cto
+
+/**
+ * A named party to the agreement
+ */
+concept Party {
+  o String name
+  o String jurisdiction
+}
+
+/**
+ * Identifies the AI agent granted authority under this contract
+ */
+concept AgentIdentity {
+  o String agentId
+  o String framework
+  o String publicKeyFingerprint
+}
+
+/**
+ * The main contract template — grants a scoped agent authority to procure SaaS subscriptions.
+ * The @template decorator marks this as the root template concept.
+ */
+@template
+concept AgentSaaSAuthorityContract {
+  o Party principal
+  o AgentIdentity agent
+  o DateTime effectiveDate
+  o DateTime expiryDate
+  o MonetaryAmount maximumAnnualSpend
+  o MonetaryAmount maximumPerTransaction
+  o String[] permittedVendorCategories
+  o String[] permittedVendorAllowList
+  o MonetaryAmount requiresHumanApprovalAbove
+  o String governingLaw
+  o Integer noticeOfTerminationDays
+  o Integer auditRightsRetentionDays
+}
+
+/**
+ * A procurement request submitted by the agent.
+ * Validated against the Concerto model by the MCP server before computing
+ * an AuthorizationDecision.
+ */
+transaction ProcurementRequest extends Request {
+  o String requestId
+  o String vendorId
+  o String vendorCategory
+  o String productName
+  o Integer subscriptionTermMonths
+  o MonetaryAmount amount
+  o Boolean isRenewal
+}
+
+/**
+ * Persistent contract state. Holds running totals that earlier versions of the
+ * model asked the agent to supply — moving them server-side means the agent
+ * cannot lie about its own history and the contract can enforce running caps.
+ */
+asset AgentAuthorityState extends State {
+  o MonetaryAmount currentYearSpend
+  o String[] approvedRequestIds
+  o DateTime spendYearStartedAt
+}
+
+/**
+ * An obligation triggered when a procurement is approved
+ */
+concept ProcurementObligation {
+  o String id
+  o String obligor
+  o String description
+  o String triggerCondition
+  o Integer deadlineDays optional
+}
+
+/**
+ * Outcome enum for the authorization decision
+ */
+enum AuthorizationOutcome {
+  o APPROVED
+  o DENIED
+  o REQUIRES_HUMAN_APPROVAL
+}
+
+/**
+ * The authorization decision returned by the MCP server after evaluating
+ * the contract terms against the agent's procurement request.
+ * No Ergo/imperative logic lives in this template — the MCP server computes
+ * this and the model just describes the schema.
+ */
+transaction AuthorizationDecision extends Response {
+  o String requestId
+  o AuthorizationOutcome decision
+  o String[] reasons
+  o ProcurementObligation[] obligations
+}

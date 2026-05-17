@@ -1,0 +1,21 @@
+{
+  "name": "@ap-demo/demo-cli",
+  "version": "0.1.0",
+  "description": "CLI orchestrator for the Accord Project Phase 2 end-to-end demo",
+  "type": "module",
+  "bin": {
+    "phase2-demo": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "@ap-demo/ap2-bridge": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "@types/node": "^22.15.18"
+  }
+}

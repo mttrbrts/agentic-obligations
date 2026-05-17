@@ -1,0 +1,145 @@
+{
+  "contractId": "acme-2026",
+  "templatePath": "/Users/matt/dev/gh/accordproject/phase2-demo/templates/agent-saas-authority",
+  "templateIdentifier": "agent-saas-authority@0.1.0",
+  "templateHash": "0b965710b5737ed9e4e5477f0bc696a8d93862307a06a8e6011c640d197ce66b",
+  "contractData": {
+    "$class": "org.accordproject.demo.agentauthority@0.1.0.AgentSaaSAuthorityContract",
+    "principal": {
+      "$class": "org.accordproject.demo.agentauthority@0.1.0.Party",
+      "name": "Acme Corp",
+      "jurisdiction": "Delaware, USA"
+    },
+    "agent": {
+      "$class": "org.accordproject.demo.agentauthority@0.1.0.AgentIdentity",
+      "agentId": "agent-007",
+      "framework": "Google Agent Payments Protocol (AP2)",
+      "publicKeyFingerprint": "SHA256:4xK9mN2pQ7rLvWsYtUjBhCgDeFiAzXoPlMkNbVcTrSw"
+    },
+    "effectiveDate": "2025-01-01T00:00:00.000Z",
+    "expiryDate": "2027-12-31T23:59:59.000Z",
+    "maximumAnnualSpend": {
+      "$class": "org.accordproject.money@0.3.0.MonetaryAmount",
+      "doubleValue": 8000,
+      "currencyCode": "USD"
+    },
+    "maximumPerTransaction": {
+      "$class": "org.accordproject.money@0.3.0.MonetaryAmount",
+      "doubleValue": 5000,
+      "currencyCode": "USD"
+    },
+    "permittedVendorCategories": [
+      "saas-productivity",
+      "saas-devtools"
+    ],
+    "permittedVendorAllowList": [
+      "workspace.google.com",
+      "atlassian.com",
+      "notion.so",
+      "slack.com",
+      "figma.com"
+    ],
+    "requiresHumanApprovalAbove": {
+      "$class": "org.accordproject.money@0.3.0.MonetaryAmount",
+      "doubleValue": 2500,
+      "currencyCode": "USD"
+    },
+    "governingLaw": "Delaware",
+    "noticeOfTerminationDays": 30,
+    "auditRightsRetentionDays": 1825
+  },
+  "state": {
+    "$class": "org.accordproject.demo.agentauthority@0.1.0.AgentAuthorityState",
+    "$identifier": "state-default",
+    "currentYearSpend": {
+      "$class": "org.accordproject.money@0.3.0.MonetaryAmount",
+      "doubleValue": 7300,
+      "currencyCode": "USD"
+    },
+    "approvedRequestIds": [
+      "req-demo-001",
+      "req-demo-002",
+      "req-demo-003"
+    ],
+    "spendYearStartedAt": "2026-05-17T18:12:08.332Z"
+  },
+  "history": [
+    {
+      "at": "2026-05-17T18:12:08.045Z",
+      "request": {
+        "$class": "org.accordproject.demo.agentauthority@0.1.0.ProcurementRequest",
+        "requestId": "req-demo-001",
+        "vendorId": "workspace.google.com",
+        "vendorCategory": "saas-productivity",
+        "productName": "Google Workspace Business Plus (10 seats, annual)",
+        "subscriptionTermMonths": 12,
+        "amount": {
+          "$class": "org.accordproject.money@0.3.0.MonetaryAmount",
+          "doubleValue": 1800,
+          "currencyCode": "USD"
+        },
+        "isRenewal": true
+      },
+      "decision": "APPROVED",
+      "obligationsHash": "d3701cde0462889f347c28942b123b4fcab6f845b3b34717b491df897f049698"
+    },
+    {
+      "at": "2026-05-17T18:12:08.353Z",
+      "request": {
+        "$class": "org.accordproject.demo.agentauthority@0.1.0.ProcurementRequest",
+        "requestId": "req-demo-002",
+        "vendorId": "figma.com",
+        "vendorCategory": "saas-productivity",
+        "productName": "Figma Organization (20 seats, annual)",
+        "subscriptionTermMonths": 12,
+        "amount": {
+          "$class": "org.accordproject.money@0.3.0.MonetaryAmount",
+          "doubleValue": 3500,
+          "currencyCode": "USD"
+        },
+        "isRenewal": false
+      },
+      "decision": "REQUIRES_HUMAN_APPROVAL",
+      "obligationsHash": "def39223fed8bf9d9f9f24dddb2b7ee724a7284f0da66f19316a6ef1fa3b21e1"
+    },
+    {
+      "at": "2026-05-17T18:12:08.545Z",
+      "request": {
+        "$class": "org.accordproject.demo.agentauthority@0.1.0.ProcurementRequest",
+        "requestId": "req-demo-003",
+        "vendorId": "atlassian.com",
+        "vendorCategory": "saas-devtools",
+        "productName": "Jira Premium (25 users, annual)",
+        "subscriptionTermMonths": 12,
+        "amount": {
+          "$class": "org.accordproject.money@0.3.0.MonetaryAmount",
+          "doubleValue": 2000,
+          "currencyCode": "USD"
+        },
+        "isRenewal": false
+      },
+      "decision": "APPROVED",
+      "obligationsHash": "82d4a1d0e2cc1332d84f6de1148cd12cbdbfeaf3dc2ad4fcd2ecd8342e666034"
+    },
+    {
+      "at": "2026-05-17T18:12:08.744Z",
+      "request": {
+        "$class": "org.accordproject.demo.agentauthority@0.1.0.ProcurementRequest",
+        "requestId": "req-demo-004",
+        "vendorId": "slack.com",
+        "vendorCategory": "saas-productivity",
+        "productName": "Slack Pro (annual)",
+        "subscriptionTermMonths": 12,
+        "amount": {
+          "$class": "org.accordproject.money@0.3.0.MonetaryAmount",
+          "doubleValue": 1000,
+          "currencyCode": "USD"
+        },
+        "isRenewal": false
+      },
+      "decision": "DENIED"
+    }
+  ],
+  "createdAt": "2026-05-17T18:12:07.991Z",
+  "updatedAt": "2026-05-17T18:12:08.871Z"
+}

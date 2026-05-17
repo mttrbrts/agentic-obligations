@@ -1,0 +1,16 @@
+{
+  "$class": "org.accordproject.demo.agentauthority@0.1.0.ProcurementRequest",
+  "$identifier": "req-2025-0317-001",
+  "$timestamp": "2025-03-17T14:30:00.000Z",
+  "requestId": "req-2025-0317-001",
+  "vendorId": "github.com",
+  "vendorCategory": "saas-devtools",
+  "productName": "GitHub Enterprise Cloud (50 seats)",
+  "subscriptionTermMonths": 12,
+  "amount": {
+    "$class": "org.accordproject.money@0.3.0.MonetaryAmount",
+    "doubleValue": 4750,
+    "currencyCode": "USD"
+  },
+  "isRenewal": true
+}
