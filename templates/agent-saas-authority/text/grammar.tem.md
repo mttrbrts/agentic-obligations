@@ -1,26 +1,28 @@
-# Agent SaaS Procurement Authority Agreement
+# Agent SaaS Procurement Authority Policy
 
-## 1. Parties
+## 1. Issuing Party
 
-This Agent SaaS Procurement Authority Agreement (the "Agreement") is entered into as of {{effectiveDate}} (the "Effective Date") by and between:
+This Agent SaaS Procurement Authority Policy (the "Policy") is issued as of {{effectiveDate}} by:
 
 {{#with principal}}
-**Principal:** {{name}}, a company incorporated under the laws of {{jurisdiction}} ("Principal"); and
+**Principal:** {{name}}, incorporated under the laws of {{jurisdiction}}.
 {{/with}}
+
+## 2. Authorized Agent
+
+Principal hereby designates the following AI agent as the authorized procurement agent under this Policy:
 
 {{#with agent}}
-**Agent:** AI agent identified as {{agentId}}, operating under the {{framework}} framework, with public-key fingerprint {{publicKeyFingerprint}} ("Agent").
+**Agent ID:** {{agentId}}\
+**Protocol Framework:** {{framework}}\
+**Public-Key Fingerprint:** {{publicKeyFingerprint}}
 {{/with}}
 
-## 2. Grant of Authority
-
-Subject to the terms and conditions of this Agreement, Principal hereby grants Agent a limited, non-exclusive, non-transferable authority to evaluate, procure, and renew SaaS software subscriptions on Principal's behalf during the Term.
-
-This Agreement expires on {{expiryDate}} unless earlier terminated in accordance with Section 8.
+This Policy takes effect on {{effectiveDate}} and expires on {{expiryDate}} unless revoked earlier under Section 8.
 
 ## 3. Scope and Spend Limits
 
-**3.1 Annual Spend Cap.** Agent's aggregate procurement authority shall not exceed {{maximumAnnualSpend}} per calendar year across all transactions executed under this Agreement.
+**3.1 Annual Spend Cap.** Agent's aggregate procurement authority shall not exceed {{maximumAnnualSpend}} per calendar year.
 
 **3.2 Per-Transaction Cap.** No single transaction executed by Agent shall exceed {{maximumPerTransaction}}.
 
@@ -38,11 +40,11 @@ This Agreement expires on {{expiryDate}} unless earlier terminated in accordance
 
 ## 4. Human-in-the-Loop Threshold
 
-Any proposed transaction with a contract value exceeding {{requiresHumanApprovalAbove}} requires prior written approval from a designated human authoriser within Principal's organisation before Agent may execute. Agent shall submit such requests through Principal's designated approval workflow and must not proceed until approval is confirmed.
+Any proposed transaction with a value exceeding {{requiresHumanApprovalAbove}} requires prior approval from a designated human authoriser within Principal's organisation before Agent may proceed.
 
-## 5. Obligations on the Agent
+## 5. Operating Constraints
 
-Agent shall, in performing its duties under this Agreement:
+When performing procurement actions under this Policy, Agent shall:
 
 (a) maintain complete and accurate records of each transaction, including vendor identity, contract value, subscription term, and execution timestamp;
 
@@ -50,30 +52,26 @@ Agent shall, in performing its duties under this Agreement:
 
 (c) immediately notify Principal of any attempted transaction that exceeds the limits set out in Section 3 or triggers the human-approval threshold in Section 4;
 
-(d) upon request, provide Principal with a full audit trail of all procurement decisions and actions taken under this Agreement; and
+(d) upon request, provide Principal with a full audit trail of all procurement decisions and actions taken under this Policy; and
 
-(e) comply with all applicable laws and Principal's internal procurement policies as notified to Agent from time to time.
+(e) comply with Principal's internal procurement policies as notified to Agent from time to time.
 
-## 6. Audit Rights
+## 6. Record Retention
 
-Principal shall retain all procurement records and Agent activity logs for a minimum of {{auditRightsRetentionDays}} days following the end of the Term. Principal, or any auditor appointed by Principal, shall have the right to inspect such records on reasonable notice.
+Principal shall retain all procurement records and Agent activity logs for a minimum of {{auditRightsRetentionDays}} days following the end of the Policy term. Principal, or any auditor appointed by Principal, shall have the right to inspect such records on reasonable notice.
 
-## 7. Representations and Warranties
+## 7. Authorization Scope
 
-Each party represents and warrants that it has full power and authority to enter into this Agreement and that this Agreement constitutes a valid and binding obligation enforceable against it in accordance with its terms.
+This Policy constitutes Principal's complete and exclusive statement of the authority granted to Agent for SaaS procurement. Any action taken by Agent outside the bounds of this Policy is unauthorized. Agent has no independent legal standing under this Policy; it is a machine-readable authorization instrument enforced by the Accord Project runtime and embedded as a cryptographic hash in each AP2 payment mandate.
 
-## 8. Termination
+## 8. Revocation
 
-Either party may terminate this Agreement for any reason by providing {{noticeOfTerminationDays}} days' prior written notice to the other party. Upon termination:
+Principal may revoke this Policy at any time by providing {{noticeOfTerminationDays}} days' prior notice. Upon revocation:
 
-(a) Agent's authority to execute new transactions shall cease immediately on the effective date of termination; and
+(a) Agent's authority to execute new transactions shall cease on the effective date of revocation; and
 
-(b) all obligations arising from transactions executed prior to termination shall survive and continue in full force.
+(b) records of all transactions executed prior to revocation shall be retained in accordance with Section 6.
 
-## 9. Governing Law
+## 9. Enforcement
 
-This Agreement shall be governed by and construed in accordance with the laws of {{governingLaw}}, without regard to its conflict-of-laws principles.
-
-## 10. Entire Agreement
-
-This Agreement constitutes the entire agreement between the parties with respect to its subject matter and supersedes all prior negotiations, representations, and agreements.
+This Policy is enforced programmatically: each authorized transaction embeds a SHA-256 hash of the evaluated obligations bundle into the AP2 payment mandate, cryptographically binding each payment to the constraints defined here. For any disputes requiring human resolution, the laws of {{governingLaw}} apply.
