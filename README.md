@@ -1,6 +1,8 @@
-# Accord Project Phase 2 Demo
+# agentic-obligations
 
-This monorepo proves the end-to-end flow: a smart legal contract evaluated by an MCP server produces a cryptographically-hashed obligations bundle that is embedded into an AP2 payment mandate, enabling downstream parties (merchant, payment processor) to verify that every payment was contract-authorised.
+A prototype demonstrating the [Accord Project](https://accordproject.org) as the open obligations layer for agentic commerce.
+
+An AI agent's SaaS procurement authority is encoded as a [Cicero](https://github.com/accordproject/cicero) smart legal contract template. An [APAP](https://github.com/accordproject/apap)-aligned MCP server evaluates the contract for every purchase request and returns a structured obligations bundle. That bundle is SHA-256 hashed and embedded into an [AP2](https://github.com/google-agentic-commerce/AP2) (Google Agent Payments Protocol) payment mandate — cryptographically binding each payment to the contract that authorised it.
 
 ## Quick Start
 
@@ -15,7 +17,7 @@ npm run demo
 ```mermaid
 graph TD
     CLI["demo-cli\n(orchestrator)"]
-    MCP["mcp-server\n(@ap-demo/obligations-mcp)\nstdio transport"]
+    MCP["mcp-server\n(APAP-aligned MCP)\nstdio transport"]
     TPL["templates/agent-saas-authority\n(Cicero template + data.json)"]
     BRIDGE["ap2-bridge\n(@ap-demo/ap2-bridge)"]
     MERCHANT["StubMerchant"]
@@ -36,38 +38,65 @@ graph TD
 ## Workspace Layout
 
 ```
-phase2-demo/
+agentic-obligations/
   packages/
-    mcp-server/        @ap-demo/obligations-mcp  — MCP stdio server (contract evaluator)
+    mcp-server/        @ap-demo/obligations-mcp  — APAP-aligned MCP server (contract evaluator)
     ap2-bridge/        @ap-demo/ap2-bridge        — AP2 mandate builders + stubs
-    demo-cli/          @ap-demo/demo-cli          — CLI orchestrator (this runs `npm run demo`)
+    demo-cli/          @ap-demo/demo-cli          — CLI orchestrator (runs `npm run demo`)
   templates/
     agent-saas-authority/                          — Cicero template + sample data
-  repos/AP2/                                       — AP2 spec clone (do not modify)
 ```
 
-## Scenarios
+## Demo Scenarios
 
-The demo runs three scenarios in sequence:
+The demo runs four scenarios in sequence. Each advances the contract's running spend total — the agent never supplies a year-to-date figure; the contract tracks it.
 
-| # | Scenario | Amount | Expected Decision |
-|---|----------|--------|-------------------|
-| 1 | GitHub Enterprise renewal | $1,800 | APPROVED |
-| 2 | Figma new purchase | $3,500 | REQUIRES_HUMAN_APPROVAL |
-| 3 | Databricks (over annual cap) | $40,000 | DENIED |
+| # | Vendor | Amount | Decision |
+|---|--------|--------|----------|
+| 1 | Google Workspace Business Plus (renewal) | $1,800 | APPROVED |
+| 2 | Figma Organization | $3,500 | REQUIRES_HUMAN_APPROVAL |
+| 3 | Atlassian Jira Premium | $2,000 | APPROVED |
+| 4 | Slack Pro | $1,000 | DENIED — running total $7,300 + $1,000 = $8,300 exceeds the $8,000 annual cap |
 
-## Why This Matters: The Gap AP Fills
+Scenario 4 is the key point: Slack Pro is on the allow list, in a permitted category, under the per-transaction cap, and under the human-approval threshold. The only reason it is denied is the accumulated contract state — which the contract owns, not the agent.
 
-The AP2 spec defines a powerful payment mandate format, but it has no built-in mechanism for proving that a payment was authorised by a contract. Without Accord Project, an agent can construct any mandate it likes — there is no cryptographic link back to the terms the principal agreed to.
+## How It Works
 
-The Phase 2 prototype fills this gap:
+### 1. Contract evaluation at the MCP layer
 
-1. **Contract evaluation at the MCP layer.** Every purchase request is evaluated by a Cicero smart legal contract (the `agent-saas-authority` template). The MCP server returns not just a decision but a structured `obligations[]` array describing the conditions of approval.
+Every purchase request is evaluated by a Cicero smart legal contract (`agent-saas-authority`). The MCP server exposes [APAP](https://github.com/accordproject/apap)-aligned tools — `trigger-agreement`, `getAgreement`, `getTemplate`, `convert-agreement-to-format` — and returns not just a decision but a structured `obligations[]` array describing the conditions of approval.
 
-2. **Cryptographic binding.** The obligations array is canonicalised (stable key order, deterministic serialisation) and SHA-256 hashed. This `obligationsHash` is embedded in both the AP2 `CheckoutMandate` and `PaymentMandate` as `accordObligations.hash`.
+### 2. Cryptographic binding
 
-3. **Verifiability.** Any party that receives the mandate can re-fetch the obligations document and verify its hash. The merchant stub and payment processor stub in this demo both **reject** mandates that lack the hash, demonstrating the enforcement point.
+The obligations array is canonicalised (stable key order, deterministic serialisation) and SHA-256 hashed. This `obligationsHash` is embedded in both the AP2 `CheckoutMandate` and `PaymentMandate` under `accordObligations.hash`. The template's own Cicero hash (`Template.getHash()`) is embedded as `accordObligations.templateHash`, pinning the mandate to a specific version of the contract logic.
 
-4. **Auditability.** Because the hash is deterministic, the obligations snapshot that authorised payment $X can be reproduced at any future audit date.
+### 3. Verifiability
 
-This is the mechanism described in the Phase 2 spec under "cryptographically linking AP2 mandates to a contract-evaluated obligations bundle."
+Any party that receives the mandate can re-fetch the obligations document and verify its hash. The stub merchant and payment processor in this demo both propagate the hash through the payment chain, demonstrating the enforcement point.
+
+### 4. Stateful contract logic
+
+The `agent-saas-authority` template maintains state across triggers: `currentYearSpend`, `approvedRequestIds`, and an automatic annual spend-year rollover. DENIED requests do not advance state. This means the contract enforces cumulative spending limits that the agent cannot work around by submitting requests individually.
+
+## MCP Tools
+
+The MCP server implements the following tools, aligned with the [APAP MCP server](https://github.com/accordproject/apap/blob/main/server/handlers/mcp.ts):
+
+| Tool | Description |
+|------|-------------|
+| `trigger-agreement` | Evaluate contract logic against a JSON payload; returns decision + obligations |
+| `getAgreement` | Retrieve a provisioned agreement by ID (includes state and history) |
+| `getTemplate` | Retrieve template metadata and Cicero hash |
+| `convert-agreement-to-format` | Draft the agreement to `html` or `markdown` |
+| `create_agreement` | Provision a new agreement instance from a template |
+| `list_agreements` | List all provisioned agreements |
+| `delete_agreement` | Remove an agreement |
+| `load_template` | Load a Cicero template from disk |
+| `compute_obligations_hash` | Compute the canonical SHA-256 hash of an obligations array |
+
+## Related
+
+- [Accord Project](https://accordproject.org) — open source smart legal contracts
+- [APAP](https://github.com/accordproject/apap) — Accord Project Agreement Protocol
+- [AP2](https://github.com/google-agentic-commerce/AP2) — Google Agent Payments Protocol
+- [Cicero](https://github.com/accordproject/cicero) — smart legal contract engine
