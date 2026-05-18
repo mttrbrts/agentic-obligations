@@ -159,6 +159,14 @@ The MCP server implements the following tools, aligned with the [APAP MCP server
 | `load_template` | Load a Cicero template from disk |
 | `compute_obligations_hash` | Compute the canonical SHA-256 hash of an obligations array |
 
+## Known Issues & Future Work
+
+- **Template-engine test failure** — One pre-existing test in `TemplateMarkInterpreter.test.ts` fails identically on both the old esbuild and new webpack implementations. Not related to the bundler change; should be investigated separately.
+
+- **PR #50 upstream** — The webpack+memfs bundler rewrite (`feat/typescript-runtime-bundle` in accordproject/template-engine) is ready for upstream merge but awaits review and integration.
+
+- **AP2 spec integration** — The `repos/AP2/` directory should be either a git submodule or removed entirely; currently it's just a local clone in `.gitignore`.
+
 ## Related
 
 - [Accord Project](https://accordproject.org) — open source smart legal contracts
