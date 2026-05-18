@@ -1,7 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import pkg from '@accordproject/cicero-core';
-import { join } from 'node:path';
+import { join, isAbsolute, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 // cicero-core is CJS; pull Template off the default export.
@@ -54,7 +54,8 @@ export function registerGetTemplateHash(server: McpServer): void {
         ),
     },
     async ({ templateId }) => {
-      const resolved = templateId ?? DEFAULT_TEMPLATE_PATH;
+      const raw = templateId ?? DEFAULT_TEMPLATE_PATH;
+      const resolved = isAbsolute(raw) ? raw : resolve(process.cwd(), raw);
       process.stderr.write(`[getTemplate] computing for ${resolved}\n`);
       const { templateIdentifier, templateHash } = await computeTemplateHash(resolved);
       const result = {

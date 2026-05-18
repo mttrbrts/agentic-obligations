@@ -1,6 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
-import { join } from 'node:path';
+import { join, isAbsolute, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import {
@@ -68,7 +68,10 @@ export function registerCreateAgreement(server: McpServer): void {
         .describe('When true, overwrite any existing agreement with this id.'),
     },
     async ({ contractData, agreementId, templatePath, replace }) => {
-      const resolvedTemplatePath = templatePath ?? DEFAULT_TEMPLATE_PATH;
+      const rawTemplatePath = templatePath ?? DEFAULT_TEMPLATE_PATH;
+      const resolvedTemplatePath = isAbsolute(rawTemplatePath)
+        ? rawTemplatePath
+        : resolve(process.cwd(), rawTemplatePath);
       const id =
         agreementId ??
         (contractData as Record<string, unknown>)['contractId']?.toString() ??

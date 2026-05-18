@@ -1,7 +1,7 @@
 ---
 name: accord-obligations-demo
 description: 'Run the Accord Project AP2 procurement demo. Use when demonstrating how an AI agent procurement workflow is governed by a smart legal contract (accord-obligations MCP). Covers setup, 4 purchase scenarios (Google Workspace, Figma, Atlassian, Slack), and the AP2 mandate chain with cryptographic obligations binding.'
-argument-hint: 'Optional: scenario number (1-4) to run a single scenario'
+argument-hint: 'Optional: "manual" to pause for user confirmation at each step; or scenario number (1-4) to run a single scenario'
 ---
 
 # Accord Project AP2 Procurement Demo
@@ -14,6 +14,22 @@ Demonstrates how the Accord Project obligations layer binds an AI agent's paymen
 - Showing how `accord-obligations` MCP governs autonomous purchasing
 - Illustrating AP2 (Agent Payments Protocol) mandate chain with cryptographic binding
 - Testing the 4 canonical scenarios (APPROVED / REQUIRES_HUMAN_APPROVAL / DENIED)
+
+## Modes
+
+### Automatic mode (default)
+Run the full demo end-to-end without stopping: setup → all 4 scenarios → summary table. Use when the user asks to "run the demo" without qualification.
+
+### Manual mode
+Activated when the user says "manual", "step by step", "I'll control", or similar. In manual mode:
+
+1. **Before each step**, describe what you are about to do and wait for the user to say "go", "next", "ok", or similar before calling any tool.
+2. **After each step**, present the result and wait again before proceeding.
+3. **Never chain two tool calls** without an intervening user confirmation.
+4. If the user asks to skip a step, skip it and move to the next.
+5. If the user asks to re-run a step, re-run it with the same inputs (unless they supply different ones).
+
+Announce the mode at the start: e.g., _"Running in manual mode — I'll describe each step and wait for your go-ahead."_
 
 ## Procedure
 
