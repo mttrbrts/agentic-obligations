@@ -159,6 +159,20 @@ The MCP server implements the following tools, aligned with the [APAP MCP server
 | `load_template` | Load a Cicero template from disk |
 | `compute_obligations_hash` | Compute the canonical SHA-256 hash of an obligations array |
 
+## Known Limitations (POC)
+
+The AP2 payment flow is intentionally stubbed to focus on the obligations-binding proof-of-concept:
+
+- **SD-JWT Signature validation** — `StubMerchant` and `StubPaymentProcessor` skip signature verification. Production would validate SD-JWT signatures on both mandates.
+
+- **Obligations document fetch** — The demo uses hash-only verification. Production would fetch the full obligations document from `accordObligations.uri` and verify its SHA-256 digest matches.
+
+- **Payment rails** — Receipts are synthetic. Production would initiate real payment flows (card networks, ACH, SEPA) and return cryptographic proof-of-settlement from the actual processor.
+
+- **Non-repudiation** — Confirmation IDs are generated locally. Production would receive them from the payment network as cryptographic proof that the transaction settled.
+
+These are placeholder implementations intentionally kept simple to demonstrate how Accord Project obligations thread through the AP2 mandate chain. Replacing the stubs with real integrations preserves the obligations-binding model.
+
 ## Known Issues & Future Work
 
 - **Template-engine test failure** — One pre-existing test in `TemplateMarkInterpreter.test.ts` fails identically on both the old esbuild and new webpack implementations. Not related to the bundler change; should be investigated separately.
