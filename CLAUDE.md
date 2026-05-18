@@ -27,7 +27,8 @@ State is persisted in `.state/acme-2026.json` and survives between sessions.
 
 | Parameter | Value |
 |---|---|
-| Counterparties | Acme Corp (principal) ↔ agent-007 (AP2 agent) |
+| Principal | Acme Corp (issues the policy) |
+| Authorized agent | agent-007 (AP2 agent, no legal standing) |
 | Annual spend cap | $8,000 USD |
 | Per-transaction cap | $5,000 USD |
 | Human-approval threshold | > $2,500 USD |
@@ -110,6 +111,7 @@ All tools are on the `accord-obligations` server.
 | `getTemplate` | `templateId: "templates/agent-saas-authority"` | `{ templateIdentifier, templateHash, algorithm }` |
 | `delete_agreement` | `agreementId` | confirmation (ignore errors) |
 | `create_agreement` | `agreementId`, `contractData`, `templatePath: "templates/agent-saas-authority"`, `replace: true` | `{ agreementId, templateHash }` |
+| `convert-agreement-to-format` | `agreementId`, `format: "markdown"` | rendered policy text — **call after `create_agreement`** so the agent reads and acknowledges the policy before running scenarios |
 
 ### Per-scenario tools
 

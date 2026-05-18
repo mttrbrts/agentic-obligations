@@ -1,5 +1,6 @@
 node_modules/
 dist/
+!vendor/**/dist/
 *.log
 
 # Runtime contract state (populated at demo time)

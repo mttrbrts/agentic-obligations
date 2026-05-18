@@ -86,6 +86,15 @@ Call `create_agreement` with:
 
 Report: "Agreement `acme-2026` created. Template hash: `<hash>`."
 
+**Step 4 — Read the policy**
+
+Call `convert-agreement-to-format` with:
+```json
+{ "agreementId": "acme-2026", "format": "markdown" }
+```
+
+Read the returned policy document in full. This is the authoritative statement of the rules you must operate within as `agent-007`. Summarise it to the user in 3–5 bullet points covering the key constraints (annual cap, per-transaction cap, approved vendors, human-approval threshold). Acknowledge that you understand these are enforced by the contract runtime — not by your own judgment — before proceeding.
+
 ---
 
 ### Scenarios
