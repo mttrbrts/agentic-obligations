@@ -90,15 +90,17 @@ graph TD
 
     CLI -->|"spawn + MCP Client"| MCP
     MCP -->|"evaluate contract"| TPL
-    MCP -->|"{ decision, obligations, obligationsHash }"| CLI
-    CLI -->|"buildCheckoutMandate(obligationsHash)"| BRIDGE
+    MCP -->|"buildCheckoutMandate(obligationsHash)"| BRIDGE
     BRIDGE --> MERCHANT
-    MERCHANT -->|"CheckoutReceipt"| CLI
-    CLI -->|"buildPaymentMandate"| BRIDGE
+    MERCHANT -->|"CheckoutReceipt"| MCP
+    MCP -->|"buildPaymentMandate"| BRIDGE
     BRIDGE --> PROCESSOR
-    PROCESSOR -->|"PaymentReceipt"| CLI
+    PROCESSOR -->|"PaymentReceipt"| MCP
+    MCP -->|"{ decision, obligations, obligationsHash, ap2 }"| CLI
     CLI -->|"verify hash matches"| CLI
 ```
+
+The mandate chain — `buildCheckoutMandate` → `StubMerchant` → `buildPaymentMandate` → `StubPaymentProcessor` — is driven entirely inside the `trigger-agreement` MCP tool. The CLI (or any agent) receives only the final result: decision, obligations, hash, and mandate receipts. It cannot trigger mandates by calling `ap2-bridge` directly without going through the server.
 
 ## Workspace Layout
 
@@ -131,15 +133,19 @@ Scenario 4 is the key point: Slack Pro is on the allow list, in a permitted cate
 
 Every purchase request is evaluated by a Cicero smart legal contract (`agent-saas-authority`). The MCP server exposes [APAP](https://github.com/accordproject/apap)-aligned tools — `trigger-agreement`, `getAgreement`, `getTemplate`, `convert-agreement-to-format` — and returns not just a decision but a structured `obligations[]` array describing the conditions of approval.
 
-### 2. Cryptographic binding
+### 2. Server-side mandate orchestration
 
-The obligations array is canonicalised (stable key order, deterministic serialisation) and SHA-256 hashed. This `obligationsHash` is embedded in both the AP2 `CheckoutMandate` and `PaymentMandate` under `accordObligations.hash`. The template's own Cicero hash (`Template.getHash()`) is embedded as `accordObligations.templateHash`, pinning the mandate to a specific version of the contract logic.
+After evaluating the contract, `trigger-agreement` drives the full AP2 payment chain internally — it builds the `CheckoutMandate`, submits it to `StubMerchant`, builds the `PaymentMandate`, and submits it to `StubPaymentProcessor`. The mandate receipts are returned alongside the authorization decision as part of a single tool response. Callers receive an outcome; they cannot construct or submit mandates without going through the server.
 
-### 3. Verifiability
+### 3. Cryptographic binding
 
-Any party that receives the mandate can re-fetch the obligations document and verify its hash. The stub merchant and payment processor in this demo both propagate the hash through the payment chain, demonstrating the enforcement point.
+The obligations array is canonicalised (stable key order, deterministic serialisation) and SHA-256 hashed. This `obligationsHash` is embedded in both the AP2 `CheckoutMandate` and `PaymentMandate` under `accordObligations.hash`, binding each payment to the specific obligations bundle the contract produced. The template's own Cicero hash (`Template.getHash()`) can be embedded as `accordObligations.templateHash`, pinning the mandate to a specific version of the contract logic.
 
-### 4. Stateful contract logic
+### 4. Verifiability
+
+Any party that receives the mandate can re-fetch the obligations document and verify its hash. The stub merchant and payment processor both propagate the hash through the payment chain, demonstrating the enforcement point.
+
+### 5. Stateful contract logic
 
 The `agent-saas-authority` template maintains state across triggers: `currentYearSpend`, `approvedRequestIds`, and an automatic annual spend-year rollover. DENIED requests do not advance state. This means the contract enforces cumulative spending limits that the agent cannot work around by submitting requests individually.
 
