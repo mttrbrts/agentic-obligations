@@ -21,8 +21,8 @@ export interface IAgentIdentity extends IConcept {
 export interface IAgentSaaSAuthorityContract extends IConcept {
    principal: IParty;
    agent: IAgentIdentity;
-   effectiveDate: Date;
-   expiryDate: Date;
+   effectiveDate: string;
+   expiryDate: string;
    maximumAnnualSpend: IMonetaryAmount;
    maximumPerTransaction: IMonetaryAmount;
    permittedVendorCategories: string[];
@@ -46,7 +46,7 @@ export interface IProcurementRequest extends IRequest {
 export interface IAgentAuthorityState extends IState {
    currentYearSpend: IMonetaryAmount;
    approvedRequestIds: string[];
-   spendYearStartedAt: Date;
+   spendYearStartedAt: string;
 }
 
 export interface IProcurementObligation extends IConcept {

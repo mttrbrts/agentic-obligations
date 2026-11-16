@@ -1,15 +1,24 @@
 // TemplateLogic, IState, IRequest, IResponse, EngineResponse etc. are injected
 // by the Accord Project template-engine runtime at bundle/trigger time
 // (see @accordproject/template-engine/src/runtime/declarations.ts).
-import {
+// The engine strips imports before evaluating this file, so only types may be
+// imported from ./generated — runtime values must be declared locally.
+import type {
   IAgentSaaSAuthorityContract,
   IProcurementRequest,
   IAuthorizationDecision,
   IProcurementObligation,
   IAgentAuthorityState,
-  AuthorizationOutcome,
+  AuthorizationOutcome as AuthorizationOutcomeEnum,
 } from './generated/org.accordproject.demo.agentauthority@0.1.0.js';
-import { IMonetaryAmount } from './generated/org.accordproject.money@0.3.0.js';
+import type { IMonetaryAmount } from './generated/org.accordproject.money@0.3.0.js';
+
+const AuthorizationOutcome = {
+  APPROVED: 'APPROVED' as AuthorizationOutcomeEnum,
+  DENIED: 'DENIED' as AuthorizationOutcomeEnum,
+  REQUIRES_HUMAN_APPROVAL: 'REQUIRES_HUMAN_APPROVAL' as AuthorizationOutcomeEnum,
+};
+type AuthorizationOutcome = AuthorizationOutcomeEnum;
 
 const NS = 'org.accordproject.demo.agentauthority@0.1.0';
 const STATE_FQN = `${NS}.AgentAuthorityState`;
@@ -35,7 +44,7 @@ function maybeRollYear(state: IAgentAuthorityState, now: Date): IAgentAuthorityS
       doubleValue: 0,
     },
     approvedRequestIds: [],
-    spendYearStartedAt: now,
+    spendYearStartedAt: now.toISOString(),
   };
 }
 
@@ -57,7 +66,7 @@ export class AgentSaaSAuthorityLogic extends TemplateLogic<IAgentSaaSAuthorityCo
         currencyCode: data.maximumAnnualSpend.currencyCode,
       },
       approvedRequestIds: [],
-      spendYearStartedAt: new Date(data.effectiveDate),
+      spendYearStartedAt: new Date(data.effectiveDate).toISOString(),
     };
     return { state };
   }
@@ -176,7 +185,7 @@ function wrap(
 ): { result: IAuthorizationDecision; state: IAgentAuthorityState; events: any[] } {
   const result: IAuthorizationDecision = {
     $class: DECISION_FQN,
-    $timestamp: new Date(),
+    $timestamp: new Date().toISOString(),
     requestId,
     decision,
     reasons,

@@ -6,23 +6,31 @@ Agent SaaS Procurement Authority Policy
 
 This Agent SaaS Procurement Authority Policy (the "Policy") is issued as of 01/01/2025 by:
 
+
+
+
 **Principal:** Acme Corp, incorporated under the laws of Delaware, USA.
+
 
 2\. Authorized Agent
 ----
 
 Principal hereby designates the following AI agent as the authorized procurement agent under this Policy:
 
+
+
+
 **Agent ID:** agent-007\
 **Protocol Framework:** Google Agent Payments Protocol (AP2)\
 **Public-Key Fingerprint:** SHA256:4xK9mN2pQ7rLvWsYtUjBhCgDeFiAzXoPlMkNbVcTrSw
+
 
 This Policy takes effect on 01/01/2025 and expires on 12/31/2027 unless revoked earlier under Section 8.
 
 3\. Scope and Spend Limits
 ----
 
-**3.1 Annual Spend Cap.** Agent's aggregate procurement authority shall not exceed 50000.0 USD per calendar year.
+**3.1 Annual Spend Cap.** Agent's aggregate procurement authority shall not exceed 8000.0 USD per calendar year.
 
 **3.2 Per-Transaction Cap.** No single transaction executed by Agent shall exceed 5000.0 USD.
 
@@ -31,7 +39,7 @@ This Policy takes effect on 01/01/2025 and expires on 12/31/2027 unless revoked 
 -  saas-devtools
 
 **3.4 Approved Vendor List.** Agent is further limited to the following approved vendors:
--  github.com
+-  workspace.google.com
 -  atlassian.com
 -  notion.so
 -  slack.com

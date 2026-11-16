@@ -16,36 +16,32 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const NM = join(__dirname, 'node_modules');
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
 function pass(msg) { console.log(`  ✓  ${msg}`); }
 function fail(msg, err) { console.error(`  ✗  ${msg}`); console.error(err?.message ?? err); process.exit(1); }
 
-// ─── resolve AP packages from local node_modules ──────────────────────────────
+// ─── resolve AP packages via node module resolution ───────────────────────────
 
-const { ModelManager, Factory, Serializer } = await import(`${NM}/@accordproject/concerto-core/index.js`);
-const { TemplateMarkInterpreter } = await import(`${NM}/@accordproject/template-engine/dist/index.js`);
-const { TemplateMarkTransformer } = await import(`${NM}/@accordproject/markdown-template/index.js`);
-const { transform } = await import(`${NM}/@accordproject/markdown-transform/index.js`);
+const { ModelManager, Factory, Serializer } = await import('@accordproject/concerto-core');
+const { TemplateMarkInterpreter } = await import('@accordproject/template-engine');
+const { TemplateMarkTransformer } = await import('@accordproject/markdown-template');
+const { transform } = await import('@accordproject/markdown-transform');
 
-// ─── Embedded external model stubs ───────────────────────────────────────────
-// cicero-core ships cached copies of external AP models; we load them
-// from the installed package.
-
-const CICERO_EXTERNAL = join(NM, '@accordproject/cicero-core/src/external');
+// ─── External model copies ───────────────────────────────────────────────────
+// The template ships local copies of its external AP models in model/.
 
 const readExternal = async (filename) => {
     try {
-        return await readFile(join(CICERO_EXTERNAL, filename), 'utf-8');
+        return await readFile(join(__dirname, 'model', filename), 'utf-8');
     } catch {
-        // cicero-core may bundle differently — return null and we'll inline
+        // missing local copy — return null and we'll inline
         return null;
     }
 };
 
-// Inline fallback model text when cicero-core doesn't expose src/external
+// Inline fallback model text when a local copy is missing
 const MONEY_MODEL = `
 concerto version "^3.0.0"
 namespace org.accordproject.money@0.3.0
