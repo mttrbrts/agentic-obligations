@@ -1,0 +1,45 @@
+{
+  "$class": "org.accordproject.demo.agentauthority@0.1.0.AgentSaaSAuthorityContract",
+  "principal": {
+    "$class": "org.accordproject.demo.agentauthority@0.1.0.Party",
+    "name": "Acme Corp",
+    "jurisdiction": "Delaware, USA"
+  },
+  "agent": {
+    "$class": "org.accordproject.demo.agentauthority@0.1.0.AgentIdentity",
+    "agentId": "agent-007",
+    "framework": "Google Agent Payments Protocol (AP2)",
+    "publicKeyFingerprint": "SHA256:4xK9mN2pQ7rLvWsYtUjBhCgDeFiAzXoPlMkNbVcTrSw"
+  },
+  "effectiveDate": "2025-01-01T00:00:00.000Z",
+  "expiryDate": "2027-12-31T23:59:59.000Z",
+  "maximumAnnualSpend": {
+    "$class": "org.accordproject.money@0.3.0.MonetaryAmount",
+    "doubleValue": 8000,
+    "currencyCode": "USD"
+  },
+  "maximumPerTransaction": {
+    "$class": "org.accordproject.money@0.3.0.MonetaryAmount",
+    "doubleValue": 5000,
+    "currencyCode": "USD"
+  },
+  "permittedVendorCategories": [
+    "saas-productivity",
+    "saas-devtools"
+  ],
+  "permittedVendorAllowList": [
+    "workspace.google.com",
+    "atlassian.com",
+    "notion.so",
+    "slack.com",
+    "figma.com"
+  ],
+  "requiresHumanApprovalAbove": {
+    "$class": "org.accordproject.money@0.3.0.MonetaryAmount",
+    "doubleValue": 2500,
+    "currencyCode": "USD"
+  },
+  "governingLaw": "Delaware",
+  "noticeOfTerminationDays": 30,
+  "auditRightsRetentionDays": 1825
+}
